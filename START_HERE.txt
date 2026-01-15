@@ -1,0 +1,65 @@
+================================================================================
+  AURORA 2.0 - Mining Monitor - QUICK START GUIDE
+================================================================================
+
+TO START THE WEB APPLICATION:
+
+Option 1 (Easiest):
+  Double-click: LAUNCH_APP.bat
+
+Option 2 (Command Line):
+  1. Open PowerShell or Command Prompt
+  2. Navigate to this folder:
+     cd "C:\Users\Rohit\Downloads\AURORA 2.0 Mining Monitor system"
+  3. Run this command:
+     python -m streamlit run app\main.py
+
+Option 3 (If Option 2 doesn't work):
+     streamlit run app\main.py
+
+================================================================================
+WHAT TO EXPECT:
+================================================================================
+
+1. A terminal window will open showing:
+   "You can now view your Streamlit app in your browser."
+   "Local URL: http://localhost:8501"
+
+2. Your web browser should automatically open to:
+   http://localhost:8501
+
+3. If the browser doesn't open automatically:
+   - Manually open your browser
+   - Go to: http://localhost:8501
+
+================================================================================
+TROUBLESHOOTING:
+================================================================================
+
+If you see "Connection Refused":
+  - Make sure Streamlit is actually running (check the terminal)
+  - Wait a few seconds for it to start
+  - Try refreshing the browser page
+
+If you see import errors:
+  - Install dependencies: pip install -r requirements.txt
+
+If port 8501 is busy:
+  - Streamlit will automatically try 8502, 8503, etc.
+  - Check the terminal for the actual URL
+
+To stop the server:
+  - Press Ctrl+C in the terminal window
+
+================================================================================
+NEED HELP?
+================================================================================
+
+Check these files for more details:
+  - HOW_TO_RUN.md (detailed instructions)
+  - README.md (full documentation)
+  - QUICKSTART.md (setup guide)
+
+================================================================================
+
+

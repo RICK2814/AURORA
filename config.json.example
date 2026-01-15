@@ -1,0 +1,27 @@
+{
+  "copernicus": {
+    "username": "your_username",
+    "password": "your_password",
+    "api_url": "https://apihub.copernicus.eu/apihub"
+  },
+  "detection": {
+    "method": "unsupervised",
+    "n_clusters": 5,
+    "cloud_cover_max": 30.0
+  },
+  "violation_detection": {
+    "initial_detection_threshold_ha": 0.1,
+    "expansion_alert_threshold_ha": 0.5,
+    "severity_high_area_ha": 2.0,
+    "severity_high_rate_ha_per_month": 1.0,
+    "severity_medium_area_ha": 0.5
+  },
+  "paths": {
+    "data_dir": "data",
+    "raw_dir": "data/raw",
+    "processed_dir": "data/processed",
+    "boundaries_dir": "data/boundaries",
+    "results_dir": "data/results"
+  }
+}
+
