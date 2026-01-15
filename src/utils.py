@@ -30,13 +30,34 @@ def save_config(config: Dict, config_path: str = "config.json"):
 
 
 def load_boundary(file_path: str) -> gpd.GeoDataFrame:
-    """Load boundary shapefile or GeoJSON"""
+    """Load boundary shapefile or GeoJSON, with automatic format detection"""
+    file_path_obj = Path(file_path)
+    
+    # If file exists as specified, load it
+    if file_path_obj.exists():
+        return gpd.read_file(file_path)
+    
+    # Try alternative extensions if the specified file doesn't exist
+    base_path = file_path_obj.with_suffix('')
+    
+    # Try .geojson if .shp was specified
     if file_path.endswith('.shp'):
-        return gpd.read_file(file_path)
+        geojson_path = base_path.with_suffix('.geojson')
+        if geojson_path.exists():
+            return gpd.read_file(str(geojson_path))
+    
+    # Try .shp if .geojson was specified
     elif file_path.endswith('.geojson') or file_path.endswith('.json'):
-        return gpd.read_file(file_path)
-    else:
-        raise ValueError(f"Unsupported file format: {file_path}")
+        shp_path = base_path.with_suffix('.shp')
+        if shp_path.exists():
+            return gpd.read_file(str(shp_path))
+    
+    # If still not found, raise error with helpful message
+    raise FileNotFoundError(
+        f"Boundary file not found: {file_path}\n"
+        f"Tried: {file_path}\n"
+        f"Also tried alternative formats, but none were found."
+    )
 
 
 def get_aoi_bounds(gdf: gpd.GeoDataFrame) -> Tuple[float, float, float, float]:

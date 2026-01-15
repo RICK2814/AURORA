@@ -334,6 +334,16 @@ elif page == "Detection Pipeline":
                      
                      st.success("Simulation completed! Results stored in session state.")
 
+                     # Display results
+                     st.subheader("Excavation Results Summary")
+                     df = st.session_state.temporal_profile
+                     if df is not None and not df.empty:
+                         st.dataframe(df)
+                         st.metric("Total Excavated Area (Latest)", f"{df['excavated_area_ha'].iloc[-1]:.2f} ha")
+                         st.metric("Average Excavation Rate", f"{df['excavation_rate_ha_per_day'].mean():.2f} ha/day")
+                     else:
+                         st.warning("No temporal profile data available.")
+
     elif method != "Simulated (Demo)":     
         n_clusters = st.slider("Number of Clusters (for unsupervised)", 3, 10, 5)
         
@@ -470,31 +480,58 @@ elif page == "Violation Detection":
     st.markdown('<h2 class="sub-header">No-Go Zone Violation Detection</h2>', 
                 unsafe_allow_html=True)
     
-    no_go_path = st.text_input("No-Go Zones Path", "data/boundaries/no_go_zones.shp")
+    # Smart default for no-go zones - check both .shp and .geojson
+    default_no_go = "data/boundaries/no_go_zones.shp"
+    if not Path(default_no_go).exists():
+        if Path("data/boundaries/no_go_zones.geojson").exists():
+            default_no_go = "data/boundaries/no_go_zones.geojson"
     
-    # Smart default for mine boundary
+    no_go_path = st.text_input("No-Go Zones Path", default_no_go)
+    
+    # Smart default for mine boundary - check both .shp and .geojson
     default_boundary = "data/boundaries/mine_boundary.shp"
     if Path("data/boundaries/mines_cils.shp").exists():
         default_boundary = "data/boundaries/mines_cils.shp"
+    elif not Path(default_boundary).exists():
+        if Path("data/boundaries/mines_cils.geojson").exists():
+            default_boundary = "data/boundaries/mines_cils.geojson"
+        elif Path("data/boundaries/mine_boundary.geojson").exists():
+            default_boundary = "data/boundaries/mine_boundary.geojson"
         
     mine_boundary_path = st.text_input("Mine Boundary Path", default_boundary)
     
     if st.button("Detect Violations"):
         if st.session_state.excavation_results:
+            # Validate file paths before proceeding
+            actual_no_go_path = no_go_path
+            if not Path(actual_no_go_path).exists():
+                # Check if .geojson alternative exists
+                if actual_no_go_path.strip().endswith('.shp'):
+                     alt_path = actual_no_go_path.replace('.shp', '.geojson')
+                     if Path(alt_path).exists():
+                         actual_no_go_path = alt_path
+                         st.warning(f"⚠️ Could not find .shp file, using available alternative: {actual_no_go_path}")
+                
+            if not Path(actual_no_go_path).exists():
+                st.error(f"❌ No-Go Zones file not found: {no_go_path}\n\n"
+                        f"Please ensure the file exists or update the path above.\n"
+                        f"Available files in data/boundaries/: {', '.join([f.name for f in Path('data/boundaries').glob('*.geojson')] + [f.name for f in Path('data/boundaries').glob('*.shp')])}")
+                st.stop()
+            
             with st.spinner("Detecting violations..."):
-                # Initialize detector
-                detector = ViolationDetector(no_go_path)
-                
-                # Load mine boundary if provided
-                mine_boundary = None
-                if mine_boundary_path and Path(mine_boundary_path).exists():
-                    mine_boundary = load_boundary(mine_boundary_path)
-                
-                # Prepare data for detection
-                results = st.session_state.excavation_results
-                
-                # distinct handling for demo data (dict of GDFs) vs real processing (dict of results)
                 try:
+                    # Initialize detector
+                    detector = ViolationDetector(actual_no_go_path)
+                
+                    # Load mine boundary if provided
+                    mine_boundary = None
+                    if mine_boundary_path and Path(mine_boundary_path).exists():
+                        mine_boundary = load_boundary(mine_boundary_path)
+                    
+                    # Prepare data for detection
+                    results = st.session_state.excavation_results
+                    
+                    # distinct handling for demo data (dict of GDFs) vs real processing (dict of results)
                     is_demo_data = False
                     first_key = list(results.keys())[0] if results else None
                     if first_key and isinstance(results[first_key], gpd.GeoDataFrame): # Demo format
@@ -540,6 +577,9 @@ elif page == "Violation Detection":
                         st.session_state.violations = (violation_df, alerts)
                         st.success(f"Violation detection completed (Real Data)! Found {len(alerts)} alerts.")
                         
+                except FileNotFoundError as e:
+                    st.error(f"❌ File not found: {str(e)}\n\n"
+                            f"Please check that the file paths are correct and the files exist.")
                 except Exception as e:
                     st.error(f"Error in violation detection: {e}")
                     import traceback

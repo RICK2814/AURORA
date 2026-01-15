@@ -33,23 +33,17 @@ class Sentinel2Downloader:
     def __init__(self, username: str = None, password: str = None):
         """
         Initialize Sentinel-2 downloader with CDSE credentials
-        
+
         Args:
             username: Copernicus username (or from COPERNICUS_USERNAME env var)
             password: Copernicus password (or from COPERNICUS_PASSWORD env var)
         """
         self.username = username or os.getenv('COPERNICUS_USERNAME')
         self.password = password or os.getenv('COPERNICUS_PASSWORD')
-        
+
         # Credentials are optional for searching, required for downloading
         self.session = requests.Session()
         self.authenticated = False
-        
-        if self.username and self.password:
-            try:
-                self._authenticate()
-            except Exception as e:
-                print(f"Warning: Authentication failed ({e}). Search may still work, but downloads will fail.")
 
     def _authenticate(self):
         """Authenticate with CDSE Identity Service (Keycloak)"""
