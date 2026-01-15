@@ -13,6 +13,25 @@ This project addresses the challenge of building a **mine-agnostic, data-adaptiv
 - **Knowledge Partner**: VEDAS, SAC-ISRO
 - **Prize Pool**: ₹25,000
 
+🌐 Live Demo (Streamlit App)
+
+You can explore the live, interactive version of AURORA 2.0 – Adaptive Mining Activity Monitor here:
+
+🔗 Live Streamlit App:
+👉 https://aurora-k94pesjpdypg79fkebhzzs.streamlit.app/
+
+What you can do in the app:
+
+📍 Visualize detected excavation areas on interactive maps
+
+📈 View temporal excavation trends and rates
+
+🚫 Inspect no-go zone violations
+
+🧪 Run the system in demo mode without Sentinel credentials
+
+⚠️ Note: Some advanced features may require backend data access or credentials when running locally.
+
 ## 📋 Key Features
 
 - **Adaptive Signature Learning**: Automatically infers spectral-temporal signatures of excavated surfaces without hard-coded thresholds
